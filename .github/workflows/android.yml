@@ -19,21 +19,20 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Install Gradle Wrapper
+      run: |
+        # اگر فایل gradlew وجود ندارد، آن را می‌سازیم
+        if [ ! -f "gradlew" ]; then
+          sudo apt-get install -y gradle
+          gradle wrapper
+        fi
+        chmod +x gradlew
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
-    - name: Make gradlew executable and Build
-      run: |
-        # پیدا کردن مسیر فایل gradlew و اجرای آن
-        GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
-        if [ -z "$GRADLEW_PATH" ]; then
-          echo "Error: gradlew not found!"
-          exit 1
-        fi
-        echo "Found gradlew at: $GRADLEW_PATH"
-        chmod +x "$GRADLEW_PATH"
-        cd $(dirname "$GRADLEW_PATH")
-        ./gradlew assembleDebug
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
