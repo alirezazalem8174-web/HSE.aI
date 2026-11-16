@@ -19,20 +19,24 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Install Gradle Wrapper
+    - name: Install Gradle
       run: |
-        # اگر فایل gradlew وجود ندارد، آن را می‌سازیم
         if [ ! -f "gradlew" ]; then
+          echo "gradlew not found, installing gradle via apt..."
+          sudo apt-get update
           sudo apt-get install -y gradle
-          gradle wrapper
         fi
-        chmod +x gradlew
-
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
 
     - name: Build with Gradle
-      run: ./gradlew assembleDebug
+      run: |
+        if [ -f "gradlew" ]; then
+          echo "Using local gradlew..."
+          chmod +x gradlew
+          ./gradlew assembleDebug
+        else
+          echo "Using system gradle..."
+          gradle assembleDebug
+        fi
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
