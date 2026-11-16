@@ -19,24 +19,15 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Install Gradle
-      run: |
-        if [ ! -f "gradlew" ]; then
-          echo "gradlew not found, installing gradle via apt..."
-          sudo apt-get update
-          sudo apt-get install -y gradle
-        fi
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: 8.7  # اینجا دقیقاً نسخه مورد نیاز را مشخص کردیم
 
     - name: Build with Gradle
       run: |
-        if [ -f "gradlew" ]; then
-          echo "Using local gradlew..."
-          chmod +x gradlew
-          ./gradlew assembleDebug
-        else
-          echo "Using system gradle..."
-          gradle assembleDebug
-        fi
+        # چون فایل gradlew نداریم، از نسخه نصب شده توسط Action استفاده می‌کنیم
+        gradle assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
