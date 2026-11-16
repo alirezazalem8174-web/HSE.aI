@@ -13,11 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: List files for debugging
-      run: |
-        echo "Current directory content:"
-        ls -R
-
     - name: set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -28,14 +23,12 @@ jobs:
       uses: gradle/actions/setup-gradle@v3
 
     - name: Build with Gradle
-      # این دستور سعی می‌کند gradlew را در هر جایی که هست پیدا کند و اجرا کند
       run: |
         if [ -f "./gradlew" ]; then
           ./gradlew assembleDebug
         elif [ -f "./HSE_AI_PRO_v4.4_GitHubBuildReady/gradlew" ]; then
           cd HSE_AI_PRO_v4.4_GitHubBuildReady && ./gradlew assembleDebug
         else
-          # اگر باز هم پیدا نشد، در تمام پوشه‌ها جستجو کن
           find . -name "gradlew" -execdir ./gradlew assembleDebug \;
         fi
 
@@ -43,5 +36,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: HSE-AI-PRO-Debug-APK
+        # این خط بسیار مهم است: با استفاده از ** در تمام پوشه‌ها به دنبال APK می‌گردد
         path: |
-          **/app/build/outputs/apk/debug/app-debug.apk
+          **/build/outputs/apk/debug/*.apk
