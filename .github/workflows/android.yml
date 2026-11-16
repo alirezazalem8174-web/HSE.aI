@@ -22,20 +22,23 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
-    - name: Build with Gradle
+    - name: Make gradlew executable and Build
       run: |
-        if [ -f "./gradlew" ]; then
-          ./gradlew assembleDebug
-        elif [ -f "./HSE_AI_PRO_v4.4_GitHubBuildReady/gradlew" ]; then
-          cd HSE_AI_PRO_v4.4_GitHubBuildReady && ./gradlew assembleDebug
-        else
-          find . -name "gradlew" -execdir ./gradlew assembleDebug \;
+        # پیدا کردن مسیر فایل gradlew و اجرای آن
+        GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+        if [ -z "$GRADLEW_PATH" ]; then
+          echo "Error: gradlew not found!"
+          exit 1
         fi
+        echo "Found gradlew at: $GRADLEW_PATH"
+        chmod +x "$GRADLEW_PATH"
+        cd $(dirname "$GRADLEW_PATH")
+        ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: HSE-AI-PRO-Debug-APK
-        # این خط بسیار مهم است: با استفاده از ** در تمام پوشه‌ها به دنبال APK می‌گردد
         path: |
+          **/app/build/outputs/apk/debug/*.apk
           **/build/outputs/apk/debug/*.apk
